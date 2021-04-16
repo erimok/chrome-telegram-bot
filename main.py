@@ -1,22 +1,42 @@
 import telebot
+from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
+from Config import Config
+from ReceiverFactory import MusicReceiver, DesignReceiver, WebDesignReceiver, ClothesReceiver, OtherReceiver
 
-# Set config
-api_id = 2673492
-api_hash = '4f6639ab11162a9fbd9bd29ea3d90a79'
-recipient_group_id = -332202964
-token = '1605473986:AAGrtmJXGnhSLoxdaYe7V_Xmq8Z-g3lDXE0'
-received_message = 'ℹ️ Вам были отправлены следующие данные:'
-file_invalid_message = '⚠️ Разрешены только аудио файлы (mp3, wav). Загрузите, пожалуйста, файл в корретном формате'
+config = Config()
+bot = telebot.TeleBot(config.get_token())
+welcome_message = config.get_config()['Common']['welcome_message']
+received_message = config.get_config()['Common']['received_message']
 
-bot = telebot.TeleBot(token)
+receivers = {
+    MusicReceiver('Music', config, bot),
+    DesignReceiver('Design', config, bot),
+    WebDesignReceiver('Web', config, bot),
+    ClothesReceiver('Clothes', config, bot),
+    OtherReceiver('Other', config, bot)
+}
 
 
 @bot.message_handler(commands=['start'])
 def start_message(message):
-    sent = bot.send_message(message.chat.id, "Добрый, как я могу к вам обращаться?")
-    bot.register_next_step_handler(sent, get_name)
+    markup = InlineKeyboardMarkup()
+    for receiver in receivers:
+        markup.add(InlineKeyboardButton(
+            receiver.get_reply_button_text(),
+            callback_data=receiver.get_key()
+        ))
+    bot.send_message(message.chat.id, welcome_message, reply_markup=markup)
 
 
+@bot.callback_query_handler(func=lambda call: True)
+def callback_query(call):
+    for receiver in receivers:
+        if call.data == receiver.get_key():
+            receiver.ask_file(call.from_user.id)
+            break
+
+
+'''
 def get_name(message):
     audio_file = bot.send_message(message.chat.id,
                                   'Здравствуйте, {name}. Загрузите, пожалуйста, Ваш аудио файл (mp3, wav)'.format(
@@ -80,5 +100,5 @@ def get_sender_account_info(account_info) -> str:
     user = 'Сообщение отправил аккаунт: @' + account_info.username
     return user
 
-
+'''
 bot.polling()
