@@ -1,7 +1,6 @@
 import telebot
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 from Config import Config
-from ReceiverFactory import MusicReceiver, DesignReceiver, WebDesignReceiver, ClothesReceiver, OtherReceiver
 
 config = Config()
 bot = telebot.TeleBot(config.get_token())
