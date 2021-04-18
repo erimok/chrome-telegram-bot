@@ -9,7 +9,7 @@ bot = telebot.TeleBot(config.get_token())
 # TODO replace to class
 receivers = {
     MusicReceiver('Beatmaker', config, bot),
-    FileReceiver('Mixing', config, bot),
+    MusicReceiver('Mixing', config, bot),
     FileReceiver('Designer', config, bot),
     FileReceiver('Clothes', config, bot),
     FileReceiver('Other', config, bot)
