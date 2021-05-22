@@ -1,5 +1,5 @@
 from Config import Config
-from Receiver import FileReceiver, MusicReceiver
+from Receiver import FileReceiver, MusicReceiver, OtherReceiver
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 import telebot
 
@@ -10,7 +10,7 @@ receivers = {
     MusicReceiver('Beatmaker', config, bot),
     FileReceiver('Designer', config, bot),
     FileReceiver('Clothes', config, bot),
-    FileReceiver('Other', config, bot)
+    OtherReceiver('Other', config, bot)
 }
 
 
