@@ -2,10 +2,12 @@ from abc import abstractmethod
 
 import telebot
 from Config import Config
+from Validation import TelegramValidation
 
 
 class Receiver:
     __chat_id: int
+    __file_type: str
 
     @abstractmethod
     def send_message(self, message):
@@ -47,37 +49,21 @@ class Receiver:
 
 
 class MusicReceiver(Receiver):
-    __file_type: str
-
     def send_message(self, message):
         if message.document is not None:
-            if self.is_valid_wav(message.document):
+            if TelegramValidation.is_valid_wav(message.document):
                 self.__file_type = 'wav'
                 self.send_to_recipient_chat_wav(message)
                 return self.get_thank_you_message(message)
 
         if message.audio is not None:
-            if self.is_valid_mp3(message.audio):
+            if TelegramValidation.is_valid_mp3(message.audio):
                 self.__file_type = 'mp3'
                 self.send_to_recipient_chat_mp3(message)
                 return self.get_thank_you_message(message)
 
         validation = self._bot.send_message(message.chat.id, self._file_request_message)
         return self._bot.register_next_step_handler(validation, self.send_message)
-
-    @staticmethod
-    def is_valid_wav(file_array: []) -> bool:
-        if file_array.mime_type is not None:
-            return file_array.mime_type == 'audio/x-wav'
-        else:
-            return False
-
-    @staticmethod
-    def is_valid_mp3(audio_array: []) -> bool:
-        if audio_array.mime_type is not None:
-            return audio_array.mime_type == 'audio/mpeg'
-        else:
-            return False
 
     def send_to_recipient_chat(self, message):
         if self.__file_type == 'vaw':
@@ -111,8 +97,6 @@ class MusicReceiver(Receiver):
 
 
 class FileReceiver(Receiver):
-    __file_type: str
-
     def send_message(self, message):
         if message.photo is not None:
             self.__file_type = 'photo'
@@ -120,27 +104,13 @@ class FileReceiver(Receiver):
             return self.get_thank_you_message(message)
 
         if message.document is not None:
-            if self.is_valid_pdf(message.document) or self.is_valid_svg(message.document):
+            if TelegramValidation.is_valid_pdf(message.document) or TelegramValidation.is_valid_svg(message.document):
                 self.__file_type = 'document'
                 self.send_to_recipient_chat_document(message)
                 return self.get_thank_you_message(message)
 
         validation = self._bot.send_message(message.chat.id, self._file_request_message)
         return self._bot.register_next_step_handler(validation, self.send_message)
-
-    @staticmethod
-    def is_valid_pdf(document: []) -> bool:
-        if document.mime_type is not None:
-            return document.mime_type == 'application/pdf'
-        else:
-            return False
-
-    @staticmethod
-    def is_valid_svg(document: []) -> bool:
-        if document.mime_type is not None:
-            return document.mime_type == 'image/svg+xml'
-        else:
-            return False
 
     def send_to_recipient_chat(self, message):
         if self.__file_type == 'document':

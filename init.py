@@ -6,10 +6,8 @@ import telebot
 config = Config()
 bot = telebot.TeleBot(config.get_token())
 
-# TODO replace to class
 receivers = {
     MusicReceiver('Beatmaker', config, bot),
-    MusicReceiver('Mixing', config, bot),
     FileReceiver('Designer', config, bot),
     FileReceiver('Clothes', config, bot),
     FileReceiver('Other', config, bot)
@@ -19,7 +17,7 @@ receivers = {
 @bot.message_handler(commands=['start'])
 def start(message):
     welcome_message = config.get_config()['Common']['welcome_message']
-    bot.send_message(message.chat.id, welcome_message, reply_markup=add_reply_buttons())
+    bot.send_message(message.chat.id, welcome_message.replace('\\n', '\n'), reply_markup=add_reply_buttons())
 
 
 def add_reply_buttons() -> telebot.types.InlineKeyboardMarkup:
