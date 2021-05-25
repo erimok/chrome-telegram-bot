@@ -1,4 +1,13 @@
-# File receiver form bot
+# File receiver bot
+
+## Bot configuration
+
+Configuration of the bot setting up via `config.ini`. 
+Example of config file is placed in root folder of the project (`config.ini.example`).
+
+## Bot initialization
+
+Entry point of the bot is `init.py`
 
 ## Venv
 
