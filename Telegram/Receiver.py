@@ -91,7 +91,7 @@ class Receiver:
         self._bot.register_next_step_handler(file, 'start')
 
     # TODO need to implement
-    def _is_start_bot(self) -> None:
+    def _is_start_bot(self, message) -> None:
         return
 
     def get_reply_button_text(self) -> str:
@@ -132,11 +132,33 @@ class FileReceiver(Receiver):
         return self._bot.register_next_step_handler(validation, self.send_message)
 
 
+class DesignReceiver(Receiver):
+    def send_message(self, message):
+        if message.photo is not None:
+            self.send_to_recipient_chat_photo(message)
+            return self.get_thank_you_message(message)
+
+        if message.document is not None:
+            if Validation.is_valid_pdf(message.document) or Validation.is_valid_svg(
+                    message.document) or Validation.is_none_compressed_image(message.document):
+                self.send_to_recipient_chat_document(message)
+                return self.get_thank_you_message(message)
+
+        validation = self._bot.send_message(message.chat.id, self._file_request_message)
+        return self._bot.register_next_step_handler(validation, self.send_message)
+
+
 class OtherReceiver(Receiver):
     def send_message(self, message):
         if message.photo is not None:
             self.send_to_recipient_chat_photo(message)
             return self.get_thank_you_message(message)
+
+        if message.document is not None:
+            if Validation.is_valid_pdf(message.document) or Validation.is_valid_svg(
+                    message.document) or Validation.is_none_compressed_image(message.document):
+                self.send_to_recipient_chat_document(message)
+                return self.get_thank_you_message(message)
 
         if message.content_type == 'video':
             self.send_to_recipient_chat_video(message)

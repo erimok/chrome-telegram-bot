@@ -1,5 +1,5 @@
 from Config import Config
-from Receiver import FileReceiver, MusicReceiver, OtherReceiver
+from Telegram.Receiver import MusicReceiver, OtherReceiver, DesignReceiver
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 import telebot
 
@@ -8,8 +8,9 @@ bot = telebot.TeleBot(config.get_token())
 
 receivers = {
     MusicReceiver('Beatmaker', config, bot),
-    FileReceiver('Designer', config, bot),
-    FileReceiver('Clothes', config, bot),
+    OtherReceiver('Photo/Video', config, bot),
+    DesignReceiver('Graphic', config, bot),
+    DesignReceiver('Clothes', config, bot),
     OtherReceiver('Other', config, bot)
 }
 
