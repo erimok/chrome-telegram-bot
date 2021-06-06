@@ -8,6 +8,17 @@ Example of config file is placed in root folder of the project (`config.ini.exam
 ## Bot initialization
 
 Entry point of the bot is `init.py`
+You have to use ssh and following command to run the bot for an unlimited time:
+> nohup python init.py &
+
+### How to restart bot
+You have to use ssh and following command:
+> ps aux 
+
+You can find `process ID`. After that use this one command `kill <process ID>`. Example:
+> kill 219394
+
+After that run bot init command again.
 
 ## Venv
 
@@ -22,4 +33,8 @@ Install required libraries
 
 Deactivate venv
 > deactivate
+
+## Git repository
+
+https://github.com/erimok/chrome-telegram-bot/
 
