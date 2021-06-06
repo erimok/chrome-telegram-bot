@@ -2,7 +2,7 @@ from abc import abstractmethod
 
 import telebot
 from Config import Config
-from Validation import TelegramValidation as Validation
+from Telegram.Validation import TelegramValidation as Validation
 
 
 class Receiver:
@@ -113,7 +113,7 @@ class MusicReceiver(Receiver):
                 self.send_to_recipient_chat_mp3(message)
                 return self.get_thank_you_message(message)
 
-        validation = self._bot.send_message(message.chat.id, self._file_request_message)
+        validation = self._bot.send_message(message.chat.id, self._validation_message)
         return self._bot.register_next_step_handler(validation, self.send_message)
 
 
@@ -128,7 +128,7 @@ class FileReceiver(Receiver):
                 self.send_to_recipient_chat_document(message)
                 return self.get_thank_you_message(message)
 
-        validation = self._bot.send_message(message.chat.id, self._file_request_message)
+        validation = self._bot.send_message(message.chat.id, self._validation_message)
         return self._bot.register_next_step_handler(validation, self.send_message)
 
 
@@ -144,7 +144,7 @@ class DesignReceiver(Receiver):
                 self.send_to_recipient_chat_document(message)
                 return self.get_thank_you_message(message)
 
-        validation = self._bot.send_message(message.chat.id, self._file_request_message)
+        validation = self._bot.send_message(message.chat.id, self._validation_message)
         return self._bot.register_next_step_handler(validation, self.send_message)
 
 
@@ -168,7 +168,7 @@ class OtherReceiver(Receiver):
             self.send_to_recipient_chat_animation(message)
             return self.get_thank_you_message(message)
 
-        validation = self._bot.send_message(message.chat.id, self._file_request_message)
+        validation = self._bot.send_message(message.chat.id, self._validation_message)
         return self._bot.register_next_step_handler(validation, self.send_message)
 
 
