@@ -14,6 +14,13 @@ class TelegramValidation:
             return False
 
     @staticmethod
+    def is_valid_video_file(document: []) -> bool:
+        if document.mime_type is not None:
+            return document.mime_type == 'video/mp4'
+        else:
+            return False
+
+    @staticmethod
     def is_valid_wav(file_array: []) -> bool:
         if file_array.mime_type is not None:
             return file_array.mime_type == 'audio/x-wav'

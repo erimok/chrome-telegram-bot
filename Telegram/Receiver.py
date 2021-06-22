@@ -156,7 +156,8 @@ class OtherReceiver(Receiver):
 
         if message.document is not None:
             if Validation.is_valid_pdf(message.document) or Validation.is_valid_svg(
-                    message.document) or Validation.is_none_compressed_image(message.document):
+                    message.document) or Validation.is_none_compressed_image(
+                message.document) or Validation.is_valid_video_file(message.document):
                 self.send_to_recipient_chat_document(message)
                 return self.get_thank_you_message(message)
 
