@@ -100,18 +100,34 @@ class Receiver:
     def get_key(self) -> str:
         return self._key
 
+    def forward_message(self, message) -> None:
+        self._bot.send_message(self._recipient_group_id, self._message_to_admin_chat)
+        self._bot.forward_message(self._recipient_group_id, message.chat.id, message.message_id)
+        self._bot.send_message(self._recipient_group_id,
+                               self._sender_message + ' ' + get_user_link(message.from_user.username))
+        self.get_thank_you_message(message)
+
+    def send_media_group_warning(self, message) -> None:
+        self._bot.send_message(message.chat.id, '⚠️⚠️⚠️ Отправляйте файлы по одному!️')
+
 
 class MusicReceiver(Receiver):
     def send_message(self, message):
         if message.document is not None:
             if Validation.is_valid_wav(message.document):
-                self.send_to_recipient_chat_wav(message)
-                return self.get_thank_you_message(message)
+                if message.media_group_id is not None:
+                    self.forward_message(message)
+                    return self.send_media_group_warning(message)
+                else:
+                    return self.forward_message(message)
 
         if message.audio is not None:
             if Validation.is_valid_mp3(message.audio):
-                self.send_to_recipient_chat_mp3(message)
-                return self.get_thank_you_message(message)
+                if message.media_group_id is not None:
+                    self.forward_message(message)
+                    return self.send_media_group_warning(message)
+                else:
+                    return self.forward_message(message)
 
         validation = self._bot.send_message(message.chat.id, self._validation_message)
         return self._bot.register_next_step_handler(validation, self.send_message)
@@ -120,13 +136,19 @@ class MusicReceiver(Receiver):
 class FileReceiver(Receiver):
     def send_message(self, message):
         if message.photo is not None:
-            self.send_to_recipient_chat_photo(message)
-            return self.get_thank_you_message(message)
+            if message.media_group_id is not None:
+                self.forward_message(message)
+                return self.send_media_group_warning(message)
+            else:
+                return self.forward_message(message)
 
         if message.document is not None:
             if Validation.is_valid_pdf(message.document) or Validation.is_valid_svg(message.document):
-                self.send_to_recipient_chat_document(message)
-                return self.get_thank_you_message(message)
+                if message.media_group_id is not None:
+                    self.forward_message(message)
+                    return self.send_media_group_warning(message)
+                else:
+                    return self.forward_message(message)
 
         validation = self._bot.send_message(message.chat.id, self._validation_message)
         return self._bot.register_next_step_handler(validation, self.send_message)
@@ -135,14 +157,20 @@ class FileReceiver(Receiver):
 class DesignReceiver(Receiver):
     def send_message(self, message):
         if message.photo is not None:
-            self.send_to_recipient_chat_photo(message)
-            return self.get_thank_you_message(message)
+            if message.media_group_id is not None:
+                self.forward_message(message)
+                return self.send_media_group_warning(message)
+            else:
+                return self.forward_message(message)
 
         if message.document is not None:
             if Validation.is_valid_pdf(message.document) or Validation.is_valid_svg(
                     message.document) or Validation.is_none_compressed_image(message.document):
-                self.send_to_recipient_chat_document(message)
-                return self.get_thank_you_message(message)
+                if message.media_group_id is not None:
+                    self.forward_message(message)
+                    return self.send_media_group_warning(message)
+                else:
+                    return self.forward_message(message)
 
         validation = self._bot.send_message(message.chat.id, self._validation_message)
         return self._bot.register_next_step_handler(validation, self.send_message)
@@ -151,23 +179,35 @@ class DesignReceiver(Receiver):
 class OtherReceiver(Receiver):
     def send_message(self, message):
         if message.photo is not None:
-            self.send_to_recipient_chat_photo(message)
-            return self.get_thank_you_message(message)
+            if message.media_group_id is not None:
+                self.forward_message(message)
+                return self.send_media_group_warning(message)
+            else:
+                return self.forward_message(message)
 
         if message.document is not None:
             if Validation.is_valid_pdf(message.document) or Validation.is_valid_svg(
                     message.document) or Validation.is_none_compressed_image(
                 message.document) or Validation.is_valid_video_file(message.document):
-                self.send_to_recipient_chat_document(message)
-                return self.get_thank_you_message(message)
+                if message.media_group_id is not None:
+                    self.forward_message(message)
+                    return self.send_media_group_warning(message)
+                else:
+                    return self.forward_message(message)
 
         if message.content_type == 'video':
-            self.send_to_recipient_chat_video(message)
-            return self.get_thank_you_message(message)
+            if message.media_group_id is not None:
+                self.forward_message(message)
+                return self.send_media_group_warning(message)
+            else:
+                return self.forward_message(message)
 
         if message.content_type == 'animation' and message.animation.mime_type == 'video/mp4':
-            self.send_to_recipient_chat_animation(message)
-            return self.get_thank_you_message(message)
+            if message.media_group_id is not None:
+                self.forward_message(message)
+                return self.send_media_group_warning(message)
+            else:
+                return self.forward_message(message)
 
         validation = self._bot.send_message(message.chat.id, self._validation_message)
         return self._bot.register_next_step_handler(validation, self.send_message)
