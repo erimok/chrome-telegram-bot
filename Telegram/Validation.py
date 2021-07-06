@@ -45,4 +45,4 @@ class TelegramValidation:
 
     @staticmethod
     def allowed_images_type() -> []:
-        return ['image/jpeg', 'image/png', 'image/jpg ']
+        return ['image/jpeg', 'image/png', 'image/jpg', 'application/binary']

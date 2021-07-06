@@ -34,6 +34,9 @@ Install required libraries
 Deactivate venv
 > deactivate
 
+Prod env:
+> source /home/pomojemb/virtualenv/bot/3.8/bin/activate && cd /home/pomojemb/bot
+
 ## Git repository
 
 https://github.com/erimok/chrome-telegram-bot/
