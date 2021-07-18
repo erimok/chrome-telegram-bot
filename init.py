@@ -1,20 +1,17 @@
 from Config import Config
 from Telegram.Receiver import MusicReceiver, OtherReceiver, DesignReceiver
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
-from Telegram.BotState import BotState
 import telebot
 
 config = Config()
 bot = telebot.TeleBot(config.get_token())
-bot_state = BotState()
-
 
 receivers = {
-    MusicReceiver('Beatmaker', config, bot, bot_state),
-    OtherReceiver('Photo/Video', config, bot, bot_state),
-    DesignReceiver('Graphic', config, bot, bot_state),
-    DesignReceiver('Clothes', config, bot, bot_state),
-    OtherReceiver('Other', config, bot, bot_state)
+    MusicReceiver('Beatmaker', config, bot),
+    OtherReceiver('Photo/Video', config, bot),
+    DesignReceiver('Graphic', config, bot),
+    DesignReceiver('Clothes', config, bot),
+    OtherReceiver('Other', config, bot)
 }
 
 
@@ -44,4 +41,4 @@ def callback_query(call):
             break
 
 
-bot.polling()
+bot.polling(none_stop=True)

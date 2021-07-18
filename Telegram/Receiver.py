@@ -3,18 +3,16 @@ from abc import abstractmethod
 import telebot
 from Config import Config
 from Telegram.Validation import TelegramValidation as Validation
-from Telegram.BotState import BotState
 
 
 class Receiver:
     __chat_id: int
-    _bot_state: BotState
 
     @abstractmethod
     def send_message(self, message):
         pass
 
-    def __init__(self, key: str, config: Config, bot: telebot.TeleBot, bot_state: BotState):
+    def __init__(self, key: str, config: Config, bot: telebot.TeleBot):
         self.__reply_button_text = config.get_config()[key]['reply_button_text']
         self._recipient_group_id = config.get_config()[key]['recipient_group_id']
         self._validation_message = config.get_config()[key]['validation_message']
@@ -24,17 +22,14 @@ class Receiver:
         self._sender_message = config.get_config()['Common']['sender_message']
         self._key = key
         self._bot = bot
-        self._bot_state = bot_state
 
     def ask_file(self, chat_id: int):
-        if not self._bot_state.is_active():
-            message = self._bot.send_message(chat_id, self._file_request_message)
-            self.__chat_id = chat_id
-            self._bot_state.set_activity(True)
-            self._bot.register_next_step_handler(message, self.send_message)
+        self._bot.clear_step_handler_by_chat_id(chat_id)
+        message = self._bot.send_message(chat_id, self._file_request_message)
+        self.__chat_id = chat_id
+        self._bot.register_next_step_handler(message, self.send_message)
 
     def get_thank_you_message(self, message):
-        self._bot_state.set_activity(False)
         self._bot.send_message(message.chat.id, self._success_message)
 
     def send_to_recipient_chat_wav(self, message):
@@ -95,10 +90,6 @@ class Receiver:
         file = self._bot.send_message(message.chat.id, '⚠️ error - '
                                                        '{}'.format(str(ex)) + '. Попробуйте еще раз')
         self._bot.register_next_step_handler(file, 'start')
-
-    # TODO need to implement
-    def _is_start_bot(self, message) -> None:
-        return
 
     def get_reply_button_text(self) -> str:
         return self.__reply_button_text
@@ -184,6 +175,11 @@ class DesignReceiver(Receiver):
 
 class OtherReceiver(Receiver):
     def send_message(self, message):
+        print(message.text)
+        if message.text == '/start':
+            # TODO restart bot
+            return
+
         if message.photo is not None:
             if message.media_group_id is not None:
                 self.forward_message(message)

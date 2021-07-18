@@ -1,3 +1,4 @@
+# Deprecated
 class BotState:
     __is_active: bool
 
