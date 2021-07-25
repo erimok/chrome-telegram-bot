@@ -20,6 +20,8 @@ class Receiver:
         self._success_message = config.get_config()[key]['success_message']
         self._message_to_admin_chat = config.get_config()[key]['message_to_admin_chat']
         self._sender_message = config.get_config()['Common']['sender_message']
+        self._config = config
+        self._mark_up = None
         self._key = key
         self._bot = bot
 
@@ -107,9 +109,27 @@ class Receiver:
     def send_media_group_warning(self, message) -> None:
         self._bot.send_message(message.chat.id, '⚠️⚠️⚠️ Отправляйте файлы по одному!️')
 
+    # TODO rework
+    def set_mark_up(self, mark_up: telebot.types.InlineKeyboardMarkup):
+        self._mark_up = mark_up
+
+    def restart_bot(self, message) -> None:
+        if self._mark_up is None:
+            return
+        self._bot.send_message(
+            message.chat.id,
+            self._config.get_config()['Common']['welcome_message'].replace('\\n', '\n'),
+            reply_markup=self._mark_up
+        )
+
 
 class MusicReceiver(Receiver):
     def send_message(self, message):
+        # TODO rework
+        if message.text == '/start':
+            self.restart_bot(message)
+            return
+
         if message.document is not None:
             if Validation.is_valid_wav(message.document):
                 if message.media_group_id is not None:
@@ -132,6 +152,11 @@ class MusicReceiver(Receiver):
 
 class FileReceiver(Receiver):
     def send_message(self, message):
+        # TODO rework
+        if message.text == '/start':
+            self.restart_bot(message)
+            return
+
         if message.photo is not None:
             if message.media_group_id is not None:
                 self.forward_message(message)
@@ -153,6 +178,11 @@ class FileReceiver(Receiver):
 
 class DesignReceiver(Receiver):
     def send_message(self, message):
+        # TODO rework
+        if message.text == '/start':
+            self.restart_bot(message)
+            return
+
         if message.photo is not None:
             if message.media_group_id is not None:
                 self.forward_message(message)
@@ -162,7 +192,7 @@ class DesignReceiver(Receiver):
 
         if message.document is not None:
             if Validation.is_valid_pdf(message.document) or Validation.is_valid_svg(
-                    message.document) or Validation.is_none_compressed_image(message.document):
+                    message.document) or Validation.is_none_compressed_file(message.document):
                 if message.media_group_id is not None:
                     self.forward_message(message)
                     return self.send_media_group_warning(message)
@@ -175,9 +205,9 @@ class DesignReceiver(Receiver):
 
 class OtherReceiver(Receiver):
     def send_message(self, message):
-        print(message.text)
+        # TODO rework
         if message.text == '/start':
-            # TODO restart bot
+            self.restart_bot(message)
             return
 
         if message.photo is not None:
@@ -189,7 +219,7 @@ class OtherReceiver(Receiver):
 
         if message.document is not None:
             if Validation.is_valid_pdf(message.document) or Validation.is_valid_svg(
-                    message.document) or Validation.is_none_compressed_image(
+                    message.document) or Validation.is_none_compressed_file(
                 message.document) or Validation.is_valid_video_file(message.document):
                 if message.media_group_id is not None:
                     self.forward_message(message)

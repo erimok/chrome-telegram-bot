@@ -15,12 +15,6 @@ receivers = {
 }
 
 
-@bot.message_handler(commands=['start'])
-def start(message):
-    welcome_message = config.get_config()['Common']['welcome_message']
-    bot.send_message(message.chat.id, welcome_message.replace('\\n', '\n'), reply_markup=add_reply_buttons())
-
-
 def add_reply_buttons() -> telebot.types.InlineKeyboardMarkup:
     markup = InlineKeyboardMarkup(row_width=2)
 
@@ -33,10 +27,21 @@ def add_reply_buttons() -> telebot.types.InlineKeyboardMarkup:
     return markup
 
 
+mark_up = add_reply_buttons()
+
+
+@bot.message_handler(commands=['start'])
+def start(message):
+    welcome_message = config.get_config()['Common']['welcome_message']
+    bot.send_message(message.chat.id, welcome_message.replace('\\n', '\n'), reply_markup=mark_up)
+
+
 @bot.callback_query_handler(func=lambda call: True)
 def callback_query(call):
     for receiver in receivers:
         if call.data == receiver.get_key():
+            # TODO rework set
+            receiver.set_mark_up(mark_up)
             receiver.ask_file(call.from_user.id)
             break
 

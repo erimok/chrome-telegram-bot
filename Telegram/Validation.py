@@ -35,10 +35,14 @@ class TelegramValidation:
             return False
 
     @staticmethod
-    def is_none_compressed_image(document: []) -> bool:
+    def is_none_compressed_file(document: []) -> bool:
         if document.mime_type is not None:
             for image_type in TelegramValidation.allowed_images_type():
                 if document.mime_type == image_type:
+                    return True
+
+            for video_type in TelegramValidation.allowed_videos_type():
+                if document.mime_type == video_type:
                     return True
 
         return False
@@ -46,3 +50,7 @@ class TelegramValidation:
     @staticmethod
     def allowed_images_type() -> []:
         return ['image/jpeg', 'image/png', 'image/jpg', 'application/binary']
+
+    @staticmethod
+    def allowed_videos_type() -> []:
+        return ['video/quicktime']
